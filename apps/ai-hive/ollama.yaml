@@ -1,23 +1,23 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
-  name: ollama
+  name: ollama-cluster
   namespace: default
 spec:
-  replicas: 1
   selector:
     matchLabels:
-      app: ollama
+      app: ollama-node
   template:
     metadata:
       labels:
-        app: ollama
+        app: ollama-node
     spec:
       containers:
       - name: ollama
         image: ollama/ollama:latest
         ports:
         - containerPort: 11434
+          hostPort: 11434
         resources:
           limits:
             cpu: "3"
@@ -25,15 +25,3 @@ spec:
           requests:
             cpu: "1"
             memory: 1Gi
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: ollama-service
-spec:
-  selector:
-    app: ollama
-  ports:
-  - protocol: TCP
-    port: 11434
-    targetPort: 11434
