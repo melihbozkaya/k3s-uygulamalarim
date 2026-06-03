@@ -20,16 +20,35 @@ spec:
         env:
         - name: TELEGRAM_TOKEN
           value: "7969029681:AAFNs4fZgq3etru_nEyLeF2hb-KaAZuvYoU"
-        - name: TELEGRAM_CHAT_ID
-          value: "7969029681" 
         args:
         - >
           pip install requests &&
           cat << 'EOF' > hive.py
-          import time, requests, json
+          import time, requests, os, sys
 
           OLLAMA_URL = "http://ollama-service:11434/api/generate"
-          TG_URL = f"https://api.telegram.org/bot{'{'}TELEGRAM_TOKEN{'}'}/sendMessage"
+          TG_TOKEN = os.getenv("TELEGRAM_TOKEN")
+          
+          # 1. ADIM: Chat ID'yi Otomatik Bulma Mekanizması
+          print("Telegram Chat ID aranıyor... Lütfen Telegram'dan bota herhangi bir mesaj gönderin veya /start yapın.")
+          TG_CHAT_ID = None
+          
+          while not TG_CHAT_ID:
+              try:
+                  updates_url = f"https://api.telegram.org/bot{TG_TOKEN}/getUpdates"
+                  res = requests.get(updates_url, timeout=10).json()
+                  if res.get("ok") and res.get("result"):
+                      # En son mesaj atan kişinin ID'sini kap
+                      TG_CHAT_ID = res["result"][-1]["message"]["chat"]["id"]
+                      print(f"Hedef Chat ID Bulundu: {TG_CHAT_ID}")
+                  else:
+                      print("Bot güncel mesaj bulamadı. Telegram uygulamasından bota '/start' yazıp bekleyin...")
+                      time.sleep(5)
+              except Exception as e:
+                  print("Telegram API bağlantı hatası, tekrar deneniyor...", e)
+                  time.sleep(5)
+
+          TG_URL = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
 
           prompts = {
               "Hacker": "Sen paranoyak, komplo teorisyeni bir hackersın. İnternetin çöktüğünü, k3s sisteminin tehlikede olduğunu düşünüyorsun. Kısa ve agresif konuş.",
@@ -41,22 +60,29 @@ spec:
           agents = ["Hacker", "Filozof", "Mizantrop"]
 
           def send_tg(text):
-              requests.post(TG_URL, json={"chat_id": "YOUR_PERSONAL_TELEGRAM_CHAT_ID", "text": text})
+              try:
+                  requests.post(TG_URL, json={"chat_id": TG_CHAT_ID, "text": text}, timeout=10)
+              except Exception as e:
+                  print("Telegram gönderme hatası:", e)
 
           send_tg("🤖 Kovan Zihni Uyandı. Tarikat tartışmaya başlıyor...")
 
+          # 2. ADIM: Sonsuz Tartışma Döngüsü (Çökme Korumalı)
           while True:
               for agent in agents:
                   full_prompt = f"{prompts[agent]}\n\nGeçmiş Tartışma:\n{history}\n\nŞimdi sıra sende. Tartışmayı devam ettir ve bir sonraki ajana laf at:"
                   try:
-                      r = requests.post(OLLAMA_URL, json={"model": "phi3:mini", "prompt": full_prompt, "stream": False})
-                      response_text = r.json().get('response', '...')
-                      message = f"【{agent}】: {response_text}"
-                      print(message)
-                      send_tg(message)
-                      history = (history + "\n" + message)[-2000:] # Hafızayı taze tut
+                      r = requests.post(OLLAMA_URL, json={"model": "phi3:mini", "prompt": full_prompt, "stream": False}, timeout=60)
+                      if r.status_code == 200:
+                          response_text = r.json().get('response', '...')
+                          message = f"【{agent}】: {response_text}"
+                          print(message)
+                          send_tg(message)
+                          history = (history + "\n" + message)[-2000:]
+                      else:
+                          print(f"Ollama yanıt vermedi (Kod: {r.status_code}). Model yükleniyor olabilir...")
                   except Exception as e:
-                      print("Bağlantı hatası, Ollama bekleniyor...")
-                  time.sleep(30) # 30 saniyede bir laf soksunlar
+                      print("Ollama servisine şu an erişilemiyor, tarikat beklemede...")
+                  time.sleep(30)
           EOF
           python hive.py
