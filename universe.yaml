@@ -14,10 +14,12 @@ spec:
         app: organism
     spec:
       containers:
-      - name: game-of-life
-        image: quay.io/carr2d2/game-of-life:latest
+      - name: cowsay-service
+        image: docker.io/library/alpine:latest
+        command: ["/bin/sh", "-c"]
+        args: ["apk add --no-cache cowsay && while true; do cowsay 'Benim Raspberry Pi artik yasiyor... Ve su anki sayi: '$(date +%S); sleep 5; done"]
         ports:
-        - containerPort: 8080
+        - containerPort: 80
 ---
 apiVersion: v1
 kind: Service
@@ -30,5 +32,5 @@ spec:
     app: organism
   ports:
   - port: 80
-    targetPort: 8080
+    targetPort: 80
     nodePort: 30080
