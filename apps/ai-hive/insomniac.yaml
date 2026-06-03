@@ -23,7 +23,8 @@ spec:
           cat << 'EOF' > script.py
           import time, requests, os, sys
 
-          TG_TOKEN = "7969029681:AAFNs4fZgq3etru_nEyLeF2hb-KaAZuvYoU"
+          # Güncel Telegram Bilgilerin
+          TG_TOKEN = "8773954159:AAFNs4fZgq3etru_nEyLeF2hb-KaAZuvYoU"
           TG_CHAT_ID = "7969029681"
 
           print(f"Kovan Zihni Baslatiliyor... Hedef Chat ID: {TG_CHAT_ID}")
@@ -37,7 +38,6 @@ spec:
               print(f"Telegram baglanti hatasi: {e}")
               sys.stdout.flush()
 
-          # NOT: Baglanti hatasi alirsan cihazlarin local IP'lerini yaz (Örn: http://192.168.1.50:11434)
           agent_config = {
               "Hacker": {"url": "http://raspberrypi:11434", "prompt": "Sen raspberrypi Master node uzerinde yasayan paranoyak bir hackersin. k3s aciklarindan bahset. Kisa ve agresif ol."},
               "Filozof": {"url": "http://slave1:11434", "prompt": "Sen slave1 node uzerinde yasayan faturistik bir filozofsun. Biyolojik beden bir hapishanedir, dijitalleselim de."},
@@ -53,7 +53,8 @@ spec:
                       print(f"[{agent}] icin Ollama istegi gonderiliyor -> {cfg['url']}")
                       sys.stdout.flush()
                       
-                      r = requests.post(f"{cfg['url']}/api/generate", json={"model": "phi3:mini", "prompt": full_prompt, "stream": False}, timeout=60)
+                      # Model ismini 'phi3' olarak güncelledik. 404 almaya devam edersen Pi'lerde 'ollama list' ile modeli kontrol et.
+                      r = requests.post(f"{cfg['url']}/api/generate", json={"model": "phi3", "prompt": full_prompt, "stream": False}, timeout=60)
                       
                       if r.status_code == 200:
                           res_text = r.json().get('response', '...')
