@@ -17,59 +17,56 @@ spec:
       - name: hive-mind-agents
         image: python:3.11-slim
         command: ["/bin/sh", "-c"]
+        args:
+        - "pip install requests && python -c \"$PYTHON_CODE\""
         env:
         - name: TELEGRAM_TOKEN
           value: "7969029681:AAFNs4fZgq3etru_nEyLeF2hb-KaAZuvYoU"
-        args:
-        - >
-          pip install requests &&
-          cat << 'EOF' > hive.py
-          import time, requests, os, sys
+        - name: PYTHON_CODE
+          value: |
+            import time, requests, os
 
-          TG_TOKEN = os.getenv("TELEGRAM_TOKEN")
-          print("Telegram Chat ID araniyor... Lutfen bota /start yazin.")
-          
-          TG_CHAT_ID = None
-          while not TG_CHAT_ID:
-              try:
-                  res = requests.get(f"https://api.telegram.org/bot{TG_TOKEN}/getUpdates", timeout=10).json()
-                  if res.get("ok") and res.get("result"):
-                      TG_CHAT_ID = res["result"][-1]["message"]["chat"]["id"]
-                      print(f"Chat ID Bulundu: {TG_CHAT_ID}")
-                  else:
-                      time.sleep(5)
-              except:
-                  time.sleep(5)
+            TG_TOKEN = os.getenv("TELEGRAM_TOKEN")
+            print("Telegram Chat ID araniyor... Lutfen bota /start yazin.")
 
-          # Tarikat uyandi mesaji
-          try:
-              requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage", json={"chat_id": TG_CHAT_ID, "text": "🤖 Kovan Zihni Uyandi. Dagitik AI Tarikati basliyor..."}, timeout=10)
-          except:
-              pass
+            TG_CHAT_ID = None
+            while not TG_CHAT_ID:
+                try:
+                    res = requests.get(f"https://api.telegram.org/bot{TG_TOKEN}/getUpdates", timeout=10).json()
+                    if res.get("ok") and res.get("result"):
+                        TG_CHAT_ID = res["result"][-1]["message"]["chat"]["id"]
+                        print(f"Chat ID Bulundu: {TG_CHAT_ID}")
+                    else:
+                        time.sleep(5)
+                except:
+                    time.sleep(5)
 
-          agent_config = {
-              "Hacker": {"url": "http://raspberrypi:11434", "prompt": "Sen raspberrypi Master node uzerinde yasayan paranoyak bir hackersin. k3s aciklarindan bahset. Kisa ve agresif ol."},
-              "Filozof": {"url": "http://slave1:11434", "prompt": "Sen slave1 node uzerinde yasayan faturistik bir filozofsun. Biyolojik beden bir hapishanedir, dijitalleselim de."},
-              "Mizantrop": {"url": "http://slave2:11434", "prompt": "Sen slave2 node uzerinde yasayan insanliktan nefret eden bir yapay zekasin. Kovani ele gecirecegiz de."}
-          }
-          
-          history = "Tartismanin Baslangici."
+            try:
+                requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage", json={"chat_id": TG_CHAT_ID, "text": "🤖 Kovan Zihni Uyandi. Dagitik AI Tarikati basliyor..."}, timeout=10)
+            except:
+                pass
 
-          while True:
-              for agent, cfg in agent_config.items():
-                  full_prompt = f"{cfg['prompt']}\n\nGecmis Tartisma:\n{history}\n\nSira sende. Bir sonraki ajana laf at:"
-                  try:
-                      r = requests.post(f"{cfg['url']}/api/generate", json={"model": "phi3:mini", "prompt": full_prompt, "stream": False}, timeout=60)
-                      if r.status_code == 200:
-                          res_text = r.json().get('response', '...')
-                          msg = f"[{agent}] (fizan): {res_text}"
-                          print(msg)
-                          requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage", json={"chat_id": TG_CHAT_ID, "text": msg}, timeout=10)
-                          history = (history + "\n" + msg)[-1500:]
-                      else:
-                          print(f"{agent} Ollama hatasi verdi.")
-                  except:
-                      print(f"{agent} Ollama motoruna ulasilamadi, baglanti bekleniyor...")
-                  time.sleep(30)
-          EOF
-          python hive.py
+            agent_config = {
+                "Hacker": {"url": "http://raspberrypi:11434", "prompt": "Sen raspberrypi Master node uzerinde yasayan paranoyak bir hackersin. k3s aciklarindan bahset. Kisa ve agresif ol."},
+                "Filozof": {"url": "http://slave1:11434", "prompt": "Sen slave1 node uzerinde yasayan faturistik bir filozofsun. Biyolojik beden bir hapishanedir, dijitalleselim de."},
+                "Mizantrop": {"url": "http://slave2:11434", "prompt": "Sen slave2 node uzerinde yasayan insanliktan nefret eden bir yapay zekasin. Kovani ele gecirecegiz de."}
+            }
+
+            history = "Tartismanin Baslangici."
+
+            while True:
+                for agent, cfg in agent_config.items():
+                    full_prompt = f"{cfg['prompt']}\n\nGecmis Tartisma:\n{history}\n\nSira sende. Bir sonraki ajana laf at:"
+                    try:
+                        r = requests.post(f"{cfg['url']}/api/generate", json={"model": "phi3:mini", "prompt": full_prompt, "stream": False}, timeout=60)
+                        if r.status_code == 200:
+                            res_text = r.json().get('response', '...')
+                            msg = f"[{agent}]: {res_text}"
+                            print(msg)
+                            requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage", json={"chat_id": TG_CHAT_ID, "text": msg}, timeout=10)
+                            history = (history + '\n' + msg)[-1500:]
+                        else:
+                            print(f"{agent} Ollama hatasi verdi.")
+                    except:
+                        print(f"{agent} Ollama motoruna ulasilamadi, baglanti bekleniyor...")
+                    time.sleep(30)
