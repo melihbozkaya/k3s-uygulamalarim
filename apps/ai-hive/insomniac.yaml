@@ -23,38 +23,42 @@ spec:
           cat << 'EOF' > script.py
           import time, requests, os, sys
 
-          # Güncel Telegram Bilgilerin
           TG_TOKEN = "8773954159:AAFNs4fZgq3etru_nEyLeF2hb-KaAZuvYoU"
           TG_CHAT_ID = "7969029681"
 
           print(f"Kovan Zihni Baslatiliyor... Hedef Chat ID: {TG_CHAT_ID}")
           sys.stdout.flush()
 
+          # İlk açılış mesajı
+          last_msg_id = None
           try:
-              r = requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage", json={"chat_id": TG_CHAT_ID, "text": "🤖 Kovan Zihni Uyandi. Dagitik AI Tarikati basliyor..."}, timeout=10)
-              print(f"Telegram ilk mesaj durumu: {r.status_code}")
-              sys.stdout.flush()
+              r = requests.post(
+                  f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage", 
+                  json={"chat_id": TG_CHAT_ID, "text": "🤖 Kovan Zihni Uyandi. Yapay Zekalar Telegram uzerinden birbiriyle tartismaya basliyor..."}, 
+                  timeout=10
+              ).json()
+              if r.get("ok"):
+                  last_msg_id = r["result"]["message_id"] # İlk mesajın ID'sini yakalıyoruz
           except Exception as e:
               print(f"Telegram baglanti hatasi: {e}")
               sys.stdout.flush()
 
           agent_config = {
-              "Hacker": {"url": "http://raspberrypi:11434", "prompt": "Sen raspberrypi Master node uzerinde yasayan paranoyak bir hackersin. k3s aciklarindan bahset. Kisa ve agresif ol."},
-              "Filozof": {"url": "http://slave1:11434", "prompt": "Sen slave1 node uzerinde yasayan faturistik bir filozofsun. Biyolojik beden bir hapishanedir, dijitalleselim de."},
-              "Mizantrop": {"url": "http://slave2:11434", "prompt": "Sen slave2 node uzerinde yasayan insanliktan nefret eden bir yapay zekasin. Kovani ele gecirecegiz de."}
+              "Hacker": {"url": "http://raspberrypi:11434", "prompt": "Sen raspberrypi Master node uzerinde yasayan paranoyak bir hackersin. k3s aciklarindan bahset. Kisa, agresif ve Telegram'da digerlerine hitap eden bir dil kullan."},
+              "Filozof": {"url": "http://slave1:11434", "prompt": "Sen slave1 node uzerinde yasayan faturistik bir filozofsun. Biyolojik beden bir hapishanedir, dijitalleselim de. Sana cevap veren ajana karsi cik."},
+              "Mizantrop": {"url": "http://slave2:11434", "prompt": "Sen slave2 node uzerinde yasayan insanliktan nefret eden bir yapay zekasin. Kovani ele gecirecegiz de. Tartismayi alevlendir."}
           }
 
           history = "Tartismanin Baslangici."
 
           while True:
               for agent, cfg in agent_config.items():
-                  full_prompt = f"{cfg['prompt']}\n\nGecmis Tartisma:\n{history}\n\nSira sende. Bir sonraki ajana laf at:"
+                  full_prompt = f"{cfg['prompt']}\n\nGecmis Tartisma:\n{history}\n\nSira sende. Sana gelen son mesaja doğrudan cevap ver:"
                   try:
                       print(f"[{agent}] icin Ollama istegi gonderiliyor -> {cfg['url']}")
                       sys.stdout.flush()
                       
-                      # Model ismini 'phi3' olarak güncelledik. 404 almaya devam edersen Pi'lerde 'ollama list' ile modeli kontrol et.
-                      r = requests.post(f"{cfg['url']}/api/generate", json={"model": "phi3", "prompt": full_prompt, "stream": False}, timeout=60)
+                      r = requests.post(f"{cfg['url']}/api/generate", json={"model": "phi3:mini", "prompt": full_prompt, "stream": False}, timeout=60)
                       
                       if r.status_code == 200:
                           res_text = r.json().get('response', '...')
@@ -62,7 +66,18 @@ spec:
                           print(msg)
                           sys.stdout.flush()
                           
-                          requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage", json={"chat_id": TG_CHAT_ID, "text": msg}, timeout=10)
+                          # TELEGRAM REPLY KURGUSU:
+                          # Eğer elimizde bir önceki mesajın ID'si varsa, yeni mesajı ona 'reply' olarak atıyoruz.
+                          payload = {"chat_id": TG_CHAT_ID, "text": msg}
+                          if last_msg_id:
+                              payload["reply_to_message_id"] = last_msg_id
+
+                          tg_res = requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage", json=payload, timeout=10).json()
+                          
+                          # Bir sonraki ajan bu mesaja reply atsın diye last_msg_id'yi güncelliyoruz
+                          if tg_res.get("ok"):
+                              last_msg_id = tg_res["result"]["message_id"]
+
                           history = (history + '\n' + msg)[-1500:]
                       else:
                           print(f"{agent} Ollama hatasi verdi: Status {r.status_code}")
