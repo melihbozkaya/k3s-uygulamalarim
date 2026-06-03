@@ -20,8 +20,8 @@ spec:
           hostPort: 11434
         resources:
           limits:
-            cpu: "3"
-            memory: 2Gi
+            cpu: "2"      # Maksimum 2 çekirdeğe kadar genişleyebilsin
+            memory: 1.5Gi # RAM limitini de Pi'leri rahatlatmak için biraz kıstık
           requests:
-            cpu: "1"
-            memory: 1Gi
+            cpu: "0.2"    # İŞTE SİHİRLİ DOKUNUŞ: Başlangıçta sadece 0.2 çekirdek rezerve etsin (K3s yer bulabilsin)
+            memory: 500Mi
