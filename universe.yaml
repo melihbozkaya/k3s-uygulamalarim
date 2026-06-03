@@ -7,17 +7,24 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: organism  # Burası 'jellyfin' değil, 'organism' olmalı!
+      app: organism
   template:
     metadata:
       labels:
-        app: organism # Burası da 'organism' olmalı
+        app: organism
     spec:
       containers:
-      - name: cowsay-service
-        image: docker.io/library/alpine:latest
+      - name: organism-container
+        image: alpine:3.18
+        # Önce paketleri yükle, sonra sonsuz döngüde inek konuşsun
         command: ["/bin/sh", "-c"]
-        args: ["apk add --no-cache cowsay && while true; do cowsay 'Benim Raspberry Pi artik yasiyor... Ve su anki sayi: '$(date +%S); sleep 5; done"]
+        args:
+          - |
+            apk add --no-cache cowsay;
+            while true; do
+              cowsay "Pi'nin icindeki ruh: $(date +%H:%M:%S) - CPU Yuk: $(cat /proc/loadavg | cut -d' ' -f1)";
+              sleep 10;
+            done
 ---
 apiVersion: v1
 kind: Service
@@ -25,10 +32,9 @@ metadata:
   name: organism-service
   namespace: default
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
-    app: organism # Burası da 'organism' olmalı, Jellyfin'i karıştırmasın
+    app: organism
   ports:
   - port: 80
     targetPort: 80
-    nodePort: 30080 # Jellyfin 30096 kullanıyor, bu 30080. Çakışma olmaz.
