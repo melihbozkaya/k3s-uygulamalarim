@@ -16,10 +16,11 @@ spec:
       containers:
       - name: organism-container
         image: alpine:3.18
-        # Önce paketleri yükle, sonra sonsuz döngüde inek konuşsun
+        # community deposunu ekleyerek cowsay'i yüklüyoruz
         command: ["/bin/sh", "-c"]
         args:
           - |
+            echo "http://dl-cdn.alpinelinux.org/alpine/v3.18/community" >> /etc/apk/repositories;
             apk add --no-cache cowsay;
             while true; do
               cowsay "Pi'nin icindeki ruh: $(date +%H:%M:%S) - CPU Yuk: $(cat /proc/loadavg | cut -d' ' -f1)";
