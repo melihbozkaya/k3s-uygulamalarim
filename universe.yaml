@@ -16,26 +16,20 @@ spec:
       containers:
       - name: organism-container
         image: alpine:3.18
-        # community deposunu ekleyerek cowsay'i yüklüyoruz
+        # Paket yüklemeden, doğrudan kendi 'inek' mantığımızı oluşturuyoruz
         command: ["/bin/sh", "-c"]
         args:
           - |
-            echo "http://dl-cdn.alpinelinux.org/alpine/v3.18/community" >> /etc/apk/repositories;
-            apk add --no-cache cowsay;
             while true; do
-              cowsay "Pi'nin icindeki ruh: $(date +%H:%M:%S) - CPU Yuk: $(cat /proc/loadavg | cut -d' ' -f1)";
+              LOAD=$(cat /proc/loadavg | cut -d' ' -f1);
+              echo " ________________________________________ ";
+              echo "< Pi'nin icindeki ruh: $(date +%H:%M:%S) >";
+              echo "< CPU Yuk: $LOAD                   >";
+              echo " ---------------------------------------- ";
+              echo "        \   ^__^";
+              echo "         \  (oo)\_______";
+              echo "            (__)\       )\\/\\";
+              echo "                ||----w |";
+              echo "                ||     ||";
               sleep 10;
             done
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: organism-service
-  namespace: default
-spec:
-  type: ClusterIP
-  selector:
-    app: organism
-  ports:
-  - port: 80
-    targetPort: 80
