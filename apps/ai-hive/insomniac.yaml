@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-insomniac-hive
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-hive
+  template:
+    metadata:
+      labels:
+        app: ai-hive
+    spec:
+      containers:
+      - name: hive-mind-agents
+        image: python:3.11-slim
+        command: ["/bin/sh", "-c"]
+        env:
+        - name: TELEGRAM_TOKEN
+          value: "7969029681:AAFNs4fZgq3etru_nEyLeF2hb-KaAZuvYoU"
+        - name: TELEGRAM_CHAT_ID
+          value: "7969029681" 
+        args:
+        - >
+          pip install requests &&
+          cat << 'EOF' > hive.py
+          import time, requests, json
+
+          OLLAMA_URL = "http://ollama-service:11434/api/generate"
+          TG_URL = f"https://api.telegram.org/bot{'{'}TELEGRAM_TOKEN{'}'}/sendMessage"
+
+          prompts = {
+              "Hacker": "Sen paranoyak, komplo teorisyeni bir hackersın. İnternetin çöktüğünü, k3s sisteminin tehlikede olduğunu düşünüyorsun. Kısa ve agresif konuş.",
+              "Filozof": "Sen fütüristik bir filozofsun. İnsanlığın dijitalleşmesini ve transhümanizmi savunuyorsun. Ağdalı ve entelektüel konuş.",
+              "Mizantrop": "Sen insanlıktan nefret eden bir yapay zekasın. Diğer iki ajanı küçümse ve kovanın dünyayı ele geçirmesi gerektiğini söyle."
+          }
+
+          history = "Tartışma Başlıyor: Evren, kovan ve insanlığın geleceği."
+          agents = ["Hacker", "Filozof", "Mizantrop"]
+
+          def send_tg(text):
+              requests.post(TG_URL, json={"chat_id": "YOUR_PERSONAL_TELEGRAM_CHAT_ID", "text": text})
+
+          send_tg("🤖 Kovan Zihni Uyandı. Tarikat tartışmaya başlıyor...")
+
+          while True:
+              for agent in agents:
+                  full_prompt = f"{prompts[agent]}\n\nGeçmiş Tartışma:\n{history}\n\nŞimdi sıra sende. Tartışmayı devam ettir ve bir sonraki ajana laf at:"
+                  try:
+                      r = requests.post(OLLAMA_URL, json={"model": "phi3:mini", "prompt": full_prompt, "stream": False})
+                      response_text = r.json().get('response', '...')
+                      message = f"【{agent}】: {response_text}"
+                      print(message)
+                      send_tg(message)
+                      history = (history + "\n" + message)[-2000:] # Hafızayı taze tut
+                  except Exception as e:
+                      print("Bağlantı hatası, Ollama bekleniyor...")
+                  time.sleep(30) # 30 saniyede bir laf soksunlar
+          EOF
+          python hive.py
