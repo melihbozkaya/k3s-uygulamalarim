@@ -17,8 +17,11 @@ spec:
       - name: hive-mind-agents
         image: python:3.11-slim
         command: ["/bin/sh", "-c"]
+        # Tırnak işaretlerini tamamen izole etmek için block formatı kullandık:
         args:
-        - "pip install requests && python -c \"$PYTHON_CODE\""
+        - |
+          pip install requests
+          python -c "$PYTHON_CODE"
         env:
         - name: TELEGRAM_TOKEN
           value: "7969029681:AAFNs4fZgq3etru_nEyLeF2hb-KaAZuvYoU"
@@ -26,20 +29,23 @@ spec:
           value: "7969029681"
         - name: PYTHON_CODE
           value: |
-            import time, requests, os
+            import time, requests, os, sys
 
             TG_TOKEN = os.getenv("TELEGRAM_TOKEN")
             TG_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
             print(f"Kovan Zihni Baslatiliyor... Hedef Chat ID: {TG_CHAT_ID}")
+            sys.stdout.flush() # Logların anında ekrana düşmesi için buffer'ı temizliyoruz
 
             try:
-                requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage", json={"chat_id": TG_CHAT_ID, "text": "🤖 Kovan Zihni Uyandi. Dagitik AI Tarikati basliyor..."}, timeout=10)
+                r = requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage", json={"chat_id": TG_CHAT_ID, "text": "🤖 Kovan Zihni Uyandi. Dagitik AI Tarikati basliyor..."}, timeout=10)
+                print(f"Telegram ilk mesaj durumu: {r.status_code}")
+                sys.stdout.flush()
             except Exception as e:
                 print(f"Telegram baglanti hatasi: {e}")
+                sys.stdout.flush()
 
-            # NOT: K3s icindeki podlar 'raspberrypi' veya 'slave1' isimlerini cozemezse 
-            # baglanti hatasi alirsin. Oyle bir durumda url kisimlarina cihazlarin yerel IP'lerini yazmalisin.
+            # NOT: Eğer bağlantı hatası alırsan cihazların local IP'lerini yaz (Örn: http://192.168.1.50:11434)
             agent_config = {
                 "Hacker": {"url": "http://raspberrypi:11434", "prompt": "Sen raspberrypi Master node uzerinde yasayan paranoyak bir hackersin. k3s aciklarindan bahset. Kisa ve agresif ol."},
                 "Filozof": {"url": "http://slave1:11434", "prompt": "Sen slave1 node uzerinde yasayan faturistik bir filozofsun. Biyolojik beden bir hapishanedir, dijitalleselim de."},
@@ -52,21 +58,24 @@ spec:
                 for agent, cfg in agent_config.items():
                     full_prompt = f"{cfg['prompt']}\n\nGecmis Tartisma:\n{history}\n\nSira sende. Bir sonraki ajana laf at:"
                     try:
-                        print(f"{agent} icin Ollama istegi gonderiliyor: {cfg['url']}")
+                        print(f"[{agent}] icin Ollama istegi gonderiliyor -> {cfg['url']}")
+                        sys.stdout.flush()
+                        
                         r = requests.post(f"{cfg['url']}/api/generate", json={"model": "phi3:mini", "prompt": full_prompt, "stream": False}, timeout=60)
                         
                         if r.status_code == 200:
                             res_text = r.json().get('response', '...')
                             msg = f"[{agent}]: {res_text}"
                             print(msg)
+                            sys.stdout.flush()
                             
-                            # Telegram'a gonder
                             requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage", json={"chat_id": TG_CHAT_ID, "text": msg}, timeout=10)
                             history = (history + '\n' + msg)[-1500:]
                         else:
                             print(f"{agent} Ollama hatasi verdi: Status {r.status_code}")
+                            sys.stdout.flush()
                     except Exception as e:
                         print(f"{agent} Ollama motoruna ulasilamadi ({cfg['url']}). Hata: {e}")
+                        sys.stdout.flush()
                     
-                    # Ajanlar arasi bekleme suresi (30 saniye)
                     time.sleep(30)
