@@ -23,5 +23,15 @@ spec:
             cpu: "2"      # Maksimum 2 çekirdeğe kadar genişleyebilsin
             memory: 1.5Gi # RAM limitini de Pi'leri rahatlatmak için biraz kıstık
           requests:
-            cpu: "0.2"    # İŞTE SİHİRLİ DOKUNUŞ: Başlangıçta sadece 0.2 çekirdek rezerve etsin (K3s yer bulabilsin)
+            cpu: "0.2"    # Başlangıçta sadece 0.2 çekirdek rezerve etsin
             memory: 500Mi
+        # 1. ADIM: Container içine disk yolunu bağlıyoruz
+        volumeMounts:
+        - name: ollama-storage
+          mountPath: /root/.ollama
+      # 2. ADIM: Pi'lerin fiziksel diskinde klasör oluşturup buraya tanımlıyoruz
+      volumes:
+      - name: ollama-storage
+        hostPath:
+          path: /mnt/ollama-models
+          type: DirectoryOrCreate
