@@ -23,5 +23,53 @@ spec:
         args:
         - >
           pip install requests &&
-          echo "aW1wb3J0IHRpbWUsIHJlcXVlc3RzLCBvcywgc3lzCgpPTExBTUFfVVJMID0gImh0dHA6Ly9vbGxhbWEtc2VydmljZToxMTQzNC9hcGkvZ2VuZXJhdGUiClRHX1RPS0VOID0gb3MuZ2V0ZW52KCJURUxFR1JBTV9UT0tFTiIpCgpwcmludCgiVGVsZWdyYW0gQ2hhdCBJRCBhcg負X255b3IuLi4gTHV0ZmVuIFRlbGVncmFtJ2RhbiBib3RhIGhlcmhhbmdpIGJpciBtZXNhaiBnbyZkZXJpbi4iKQpUR19DSEFUX0lEID0gTm9uZQp3aGlsZSBub3QgVEdfQ0hBVF9JRDoKICAgIHRyeToKICAgICAgICByZXMgPSByZXF1ZXN0cy5nZXQoZilodHRwczovL2FwaS50ZWxlZ3JhbS5vcmcvYm90e1RHX1RPS0VOfS9nZXRVcGRhdGVzIiwgdGltZW91dD0xMCkuanNvbigpCiAgICAgICAgaWYgcmVzLmdldCgib2siKSBhbmQgcmVzLmdldCgicmVzdWx0Iik6CiAgICAgICAgICAgIFRHX0NIQVRfSUQgPSByZXNbInJlc3VsdCJbLTFdWyJtZXNzYWdlIl1bImNoYXQiXVsiaWQiXQogICAgICAgICAgICBwcmludChmIkhlZGVmIENoYXQgSUQgQnVsdW5kdToge1RHX0NIQVRfSUR9IikKICAgICAgICBlbHNlOgogICAgICAgICAgICBwcmludCgiQm90IG1lc2FqIGJ1bGFtYWRpLiBUZWxlZ3JhbSdhbiBib3RhICcvc3RhcnQnIHlhemFuLiIpCiAgICAgICAgICAgIHRpbWUuc2xlZXAoNSkKICAgIGV4Y2VwdCBFeGNlcHRpb24gYXMgZToKICAgICAgICBwcmludCgiVGVsZWdyYW0gYmFnbGFudGkgaGF0YXNpLi4uIikKICAgICAgICB0aW1lLnNsZWVwKDUpCgpUR19VUkwgPSBmImh0dHBzOi8vYXBpLnRlbGVncmFtLm9yZy9ib3R7VEdfVE9LRU59L3NlbmRNZXNzYWdlIgpwcm9tcHRzID0gewogICAgIkhhY2tlciI6ICJTZW4gcGFyYW5veWFrLCBrb21wbG8gdGVvcmlzeWVuaSBiaXIgaGFja2Vyc2luLiBrM3Mgc2lzdGVtaW5pbiB0ZWhsaWtlZGUgb2xkdWd1bnUgZHVzdW51eW9yc3VuLiBLaXNhIHZlIGFncmVzaWYga29udXMuIiwKICAgICAiRmlsb3pvZiI6ICJTZW4gZnV0dXJpc3RpayBiaXIgZmlsb3pvZnN1bi4gSW5zYW5saWdpbiBkaWppdGFsbGVzbWVzaW5pIHZlIHRyYW5zaHVtYW5pem1pIHNhdnVudXlvcnN1bi4iLAogICAgICJNaXphbnRyb3AiOiAiU2VuIGluc2FubGlra2FuIG5lZnJldCBlZGVuIGJpciB5YXBheSB6ZWthc2luLiBLb3ZhbmkgZWxlIGdlY2lybWVtaXogZ2VyZWt0aWdpbmkgc295bGUuIgp9Cmhpc3RvcnkgPSAiVGFydGlzbWEgQmFzbGl5b3IuIgphZ2VudHMgPSBbIkhhY2tlciIsICJGaWxvem9mIiwgIk1pemFudHJvcCJdCgpkZWYgc2VuZF90Zyh0ZXh0KToKICAgIHRyeTogcmVxdWVzdHMucG9zdChUR19VUkwsIGpzb249eyJjaGF0X2lkIjogVEdfQ0hBVF9JRCwgInRleHQiOiB0ZXh0fSwgdGltZW91dD0xMCkKICAgIGV4Y2VwdDogcGFzcwoKc2VuZF90Zygi8J+klSBLb3ZhbiBaaWhuaSBVeWFuZGkuLi4iKQp3aGlsZSBUcnVlOgogICAgZm9yIGFnZW50IGluIGFnZW50czoKICAgICAgICBmdWxsX3Byb21wdCA9IGYoIntwcm9tcHRzW2FnZW50XX1cblxuR2VjbWlzOlxue2hpc3Rvcnl9XG5cblNpcmEgc2VuZGUuIgogICAgICAgIHRyeToKICAgICAgICAgICAgciA9IHJlcXVlc3RzLnBvc3QoT0xMQU1BX1VSTCwganNvbj17Im1vZGVsIjogInBoaTM6bWluaSIsICJwcm9tcHQiOiBmdWxsX3Byb21wdCwgInN0cmVhbSI6IEZhbHNlfSwgdGltZW91dD02MCkKICAgICAgICAgICAgaWYgci5zdGF0dXNfY29kZSA9PSAyMDA6CiAgICAgICAgICAgICAgICBtc2cgPSBmIktPVkFOIHthZ2VudH06IHtyLmpzb24oKS5nZXQoJ3Jlc3BvbnNlJywgJy4uLicpfSIKICAgICAgICAgICAgICAgIHByaW50KG1zZykKICAgICAgICAgICAgICAgIHNlbmRfdGcobXNnKQogICAgICAgICAgICAgICAgaGlzdG9yeSA9IChoaXN0b3J5ICsgIlxuIiArIG1zZyRbLTIwMDBdCiAgICAgICAgICAgIGVsc2U6CiAgICAgICAgICAgICAgICBwcmludCgiT2xsYW1hIGhhdGEgdmVyZGkuIikKICAgICAgICBleGNlcHQ6CiAgICAgICAgICAgIHByaW50KCJPbGxhbWEgYmVrbGVuaXlvci4uLiIpCiAgICAgICAgdGltZS5zbGVlcCgzMCk=" | base64 -d > hive.py &&
+          cat << 'EOF' > hive.py
+          import time, requests, os, sys
+
+          TG_TOKEN = os.getenv("TELEGRAM_TOKEN")
+          print("Telegram Chat ID araniyor... Lutfen bota /start yazin.")
+          
+          TG_CHAT_ID = None
+          while not TG_CHAT_ID:
+              try:
+                  res = requests.get(f"https://api.telegram.org/bot{TG_TOKEN}/getUpdates", timeout=10).json()
+                  if res.get("ok") and res.get("result"):
+                      TG_CHAT_ID = res["result"][-1]["message"]["chat"]["id"]
+                      print(f"Chat ID Bulundu: {TG_CHAT_ID}")
+                  else:
+                      time.sleep(5)
+              except:
+                  time.sleep(5)
+
+          # Tarikat uyandi mesaji
+          try:
+              requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage", json={"chat_id": TG_CHAT_ID, "text": "🤖 Kovan Zihni Uyandi. Dagitik AI Tarikati basliyor..."}, timeout=10)
+          except:
+              pass
+
+          agent_config = {
+              "Hacker": {"url": "http://raspberrypi:11434", "prompt": "Sen raspberrypi Master node uzerinde yasayan paranoyak bir hackersin. k3s aciklarindan bahset. Kisa ve agresif ol."},
+              "Filozof": {"url": "http://slave1:11434", "prompt": "Sen slave1 node uzerinde yasayan faturistik bir filozofsun. Biyolojik beden bir hapishanedir, dijitalleselim de."},
+              "Mizantrop": {"url": "http://slave2:11434", "prompt": "Sen slave2 node uzerinde yasayan insanliktan nefret eden bir yapay zekasin. Kovani ele gecirecegiz de."}
+          }
+          
+          history = "Tartismanin Baslangici."
+
+          while True:
+              for agent, cfg in agent_config.items():
+                  full_prompt = f"{cfg['prompt']}\n\nGecmis Tartisma:\n{history}\n\nSira sende. Bir sonraki ajana laf at:"
+                  try:
+                      r = requests.post(f"{cfg['url']}/api/generate", json={"model": "phi3:mini", "prompt": full_prompt, "stream": False}, timeout=60)
+                      if r.status_code == 200:
+                          res_text = r.json().get('response', '...')
+                          msg = f"[{agent}] (fizan): {res_text}"
+                          print(msg)
+                          requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage", json={"chat_id": TG_CHAT_ID, "text": msg}, timeout=10)
+                          history = (history + "\n" + msg)[-1500:]
+                      else:
+                          print(f"{agent} Ollama hatasi verdi.")
+                  except:
+                      print(f"{agent} Ollama motoruna ulasilamadi, baglanti bekleniyor...")
+                  time.sleep(30)
+          EOF
           python hive.py
